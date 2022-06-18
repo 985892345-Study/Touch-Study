@@ -73,13 +73,13 @@ class DispatchScrollView @JvmOverloads constructor(
         if (mIsNeedBreakOff) {
           if (!mLongPressRunnable.isInLongPress()) {
             if (abs(mDiffMoveX) > mTouchSlop || abs(mDiffMoveY) > mTouchSlop) {
-              // 此时大于阈值，等会在 onInterceptTouchEvent 中就直接拦截
+              // 此时大于 mTouchSlop，等会在 onInterceptTouchEvent 中就直接拦截
               mIsNeedBreakOff = false
               mLongPressRunnable.cancel()
             } else {
               /*
-              * 这里 return true 可以终止事件向下传递，意思就是 MOVE 事件会一直卡在这里
-              * onInterceptTouchEvent 和 onTouchEvent 将会收不到 MOVE 这个事件，将不会被调用
+              * 这里 return true 可以终止事件向下传递，意思就是 MOVE 事件会一直卡在这里，
+              * onInterceptTouchEvent 和 onTouchEvent 以及子 View 将都收不到这个 MOVE 事件，
               * 所以这里可以用来等待长按时间结束。
               * */
               return true
@@ -94,7 +94,7 @@ class DispatchScrollView @JvmOverloads constructor(
         mLongPressRunnable.cancel()
       }
     }
-    return super.dispatchTouchEvent(ev)
+    return super.dispatchTouchEvent(ev) // 如果 return super，则会走正常的事件分发流程
   }
   
   override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
@@ -109,7 +109,7 @@ class DispatchScrollView @JvmOverloads constructor(
       return isIntercept
     }
     if (!mIsNeedBreakOff && !mLongPressRunnable.isInLongPress()) {
-      // 此时肯定是自己拦截事件
+      // 对应在 dispatchTouchEvent 大于 mTouchSlop 的处理，此时肯定是自己拦截事件
       return true
     }
     return false
