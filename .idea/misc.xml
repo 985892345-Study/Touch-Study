@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Android_Studio/Project/Test/TouchStudy/app/src/main/res/layout/activity_main.xml" value="0.3220108695652174" />
+        <entry key="..\:/Android_Studio/Project/Test/TouchStudy/app/src/main/res/layout/layout_background.xml" value="0.24282786885245902" />
+        <entry key="..\:/Android_Studio/Project/Test/TouchStudy/app/src/main/res/layout/layout_dispatch.xml" value="0.3220108695652174" />
+        <entry key="..\:/Android_Studio/Project/Test/TouchStudy/app/src/main/res/layout/layout_in.xml" value="0.3220108695652174" />
+        <entry key="..\:/Android_Studio/Project/Test/TouchStudy/app/src/main/res/layout/layout_inner.xml" value="0.3220108695652174" />
+        <entry key="..\:/Android_Studio/Project/Test/TouchStudy/app/src/main/res/layout/layout_nested.xml" value="0.3220108695652174" />
+        <entry key="..\:/Android_Studio/Project/Test/TouchStudy/app/src/main/res/layout/layout_out.xml" value="0.25" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
