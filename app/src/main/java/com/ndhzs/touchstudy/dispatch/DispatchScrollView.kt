@@ -9,7 +9,7 @@ import com.ndhzs.touchstudy.VibratorUtil
 import kotlin.math.abs
 
 /**
- * 重写 dispatchTouchEvent 也可以实现需求，这个方法不是很推荐，但可以作为参考
+ * 重写 dispatchTouchEvent 也可以实现需求，但这个方法不是很推荐，仅作为参考
  * （不推荐原因：重写 dispatchTouchEvent 会导致事件不按正常情况下分发，会导致其他人看不懂）
  *
  *
@@ -26,7 +26,7 @@ import kotlin.math.abs
  * @date 2022/6/18 20:47
  */
 class DispatchScrollView @JvmOverloads constructor(
-  context: Context?,
+  context: Context,
   attrs: AttributeSet? = null,
   defStyleAttr: Int = 0,
   defStyleRes: Int = 0
@@ -73,6 +73,7 @@ class DispatchScrollView @JvmOverloads constructor(
         if (mIsNeedBreakOff) {
           if (!mLongPressRunnable.isInLongPress()) {
             if (abs(mDiffMoveX) > mTouchSlop || abs(mDiffMoveY) > mTouchSlop) {
+              // 此时大于阈值，等会在 onInterceptTouchEvent 中就直接拦截
               mIsNeedBreakOff = false
               mLongPressRunnable.cancel()
             } else {
@@ -103,6 +104,7 @@ class DispatchScrollView @JvmOverloads constructor(
       if (isIntercept) {
         // 这个判断与 OuterScrollView 的注释类似，但这里是 cancel 掉长按，因为长按是在 dispatchTouchEvent 中开启的
         mLongPressRunnable.cancel()
+        mIsNeedBreakOff = false
       }
       return isIntercept
     }

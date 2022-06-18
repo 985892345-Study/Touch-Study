@@ -52,7 +52,8 @@ import kotlin.math.abs
  * 这个对于 外部拦截法 和 内部拦截法 都无解，只能使用接口来解耦合
  *
  * 这里我就不上代码了，大致思路是写个接口，定义向上滚动和向下滚动的方法，ScrollView 实现该接口，
- * 给 RectView 传入该接口，在滑到边缘时调用即可。但注意：ScrollView 滑动后会导致 RectView 坐标系的移动，难度还是挺高的
+ * 给 RectView 传入该接口，在滑到边缘时调用即可（滑到边缘还涉及到坐标系的装换，如果在 ScrollView 中实现就不用）。
+ * 但注意：ScrollView 滑动后会导致 RectView 坐标系的移动，难度还是挺高的
  *
  * @author 985892345 (Guo Xiangrui)
  * @email 2767465918@qq.com

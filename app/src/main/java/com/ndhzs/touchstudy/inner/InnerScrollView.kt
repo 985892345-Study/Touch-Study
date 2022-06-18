@@ -24,7 +24,7 @@ import android.widget.ScrollView
  * @date 2022/6/18 19:48
  */
 class InnerScrollView @JvmOverloads constructor(
-  context: Context?,
+  context: Context,
   attrs: AttributeSet? = null,
   defStyleAttr: Int = 0,
   defStyleRes: Int = 0
