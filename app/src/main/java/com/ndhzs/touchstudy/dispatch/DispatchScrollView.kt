@@ -18,8 +18,13 @@ import kotlin.math.abs
  *
  *
  * 这个算是 外部拦截法 的一种特殊方法，外部拦截法需要在子 View 对长按未激活前的 Move 事件进行判断，但这个方法可以使子 View 不进行判断，
- * 原理就是不把那段事件分发给子 View
+ * 原理就是不把那段事件分发给子 View，
  *
+ * 带来的好处：
+ * - ScrollView 不用通知 RectView 长按已经激活，降低了耦合度
+ *
+ *
+ * 但总的来说，不是很推荐这个方法，修改 dispatchTouchEvent 会给以后不熟悉事件分发的人带来麻烦
  *
  * @author 985892345 (Guo Xiangrui)
  * @email 2767465918@qq.com

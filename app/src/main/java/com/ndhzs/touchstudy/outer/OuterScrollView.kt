@@ -22,6 +22,19 @@ class OuterScrollView @JvmOverloads constructor(
   defStyleRes: Int = 0
 ) : ScrollView(context, attrs, defStyleAttr, defStyleRes) {
   
+  /**
+   * 添加长按激活的回调
+   *
+   * 提供该方法的原因如下：
+   * - RectView 会收到长按激活前的 Move 事件，所以需要进行判断
+   * - 在长按激活时，此时需要立即绘制矩形，但 RectView 绘制矩形只能在移动时绘制
+   */
+  fun addOnLongPress(l: OnLongPressListener) {
+    mOnLongPressListeners.add(l)
+  }
+  
+  private val mOnLongPressListeners = mutableListOf<OnLongPressListener>()
+  
   private var mInitialX = 0
   private var mInitialY = 0
   private var mLastMoveX = 0
@@ -122,5 +135,11 @@ class OuterScrollView @JvmOverloads constructor(
   private fun onLongPress() {
     // 来个震动
     VibratorUtil.start(context, 30)
+    mOnLongPressListeners.forEach { it.onLongPressActivate() }
+  }
+  
+  // 长按激活的监听
+  fun interface OnLongPressListener {
+    fun onLongPressActivate()
   }
 }

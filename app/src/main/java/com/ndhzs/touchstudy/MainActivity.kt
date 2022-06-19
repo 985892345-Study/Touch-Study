@@ -27,14 +27,17 @@ import android.os.Bundle
  *
  * # 观看顺序（包名）
  * - outer
+ * - dispatch
  * - inner
- * - nested
+ *
+ *
+ * 最后推荐使用 内部拦截法，耦合度最低
  */
 class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-//    setContentView(R.layout.layout_outer)
+    setContentView(R.layout.layout_outer)
+//    setContentView(R.layout.layout_dispatch)
 //    setContentView(R.layout.layout_inner)
-    setContentView(R.layout.layout_dispatch)
   }
 }

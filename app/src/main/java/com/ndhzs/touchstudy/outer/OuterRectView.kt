@@ -3,8 +3,10 @@ package com.ndhzs.touchstudy.outer
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.ViewConfiguration
+import android.view.ViewGroup
 import com.ndhzs.touchstudy.widget.BaseRectView
 import kotlin.math.abs
 
@@ -42,10 +44,7 @@ import kotlin.math.abs
  * 意思是 ScrollView 决定了长按的开启和取消，但在长按激活前 RectView 不允许绘图，如果长按激活了，需要 ScrollView 来通知它，
  * 这样就会造成耦合，这也是外部拦截法的一个缺点
  *
- * 这里采用另一种做法：使用 mTouchSlop 来判断，因为该变量是官方的规范，ScrollView 和 RectView 同时使用的话就不会出问题，
- * 但在长按激活时并不会立马绘制矩形，这算是它不足的地方
- *
- * 如果想较好的解决可以使用接口，但增加了耦合度，想优雅解决的话可以去看 内部拦截法 和 重写事件分发法
+ * 想优雅解决的话可以去看 重写事件分发法 和 内部拦截法
  *
  *
  * ## 在移动到屏幕边缘时该怎样使 ScrollView 滚动
@@ -64,7 +63,7 @@ class OuterRectView @JvmOverloads constructor(
   attrs: AttributeSet? = null,
   defStyleAttr: Int = 0,
   defStyleRes: Int = 0
-) : BaseRectView(context, attrs, defStyleAttr, defStyleRes) {
+) : BaseRectView(context, attrs, defStyleAttr, defStyleRes), OuterScrollView.OnLongPressListener {
   
   private var mInitialX = 0
   private var mInitialY = 0
@@ -75,14 +74,6 @@ class OuterRectView @JvmOverloads constructor(
   
   private var mIsAllowDraw = false
   
-  /**
-   * 很重要的一个变量，用来决定是滑动行为的最小移动距离，不同的手机该变量得到的值不同
-   *
-   * 意思就是只要你移动给的距离小于它，我就认为你手指没有移动
-   *
-   * 该变量在官方很多滑动控件中都用到了，比如：ScrollView、RecyclerView 等
-   */
-  private val mTouchSlop = ViewConfiguration.get(context).scaledTouchSlop
   
   @SuppressLint("ClickableViewAccessibility")
   override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -101,19 +92,18 @@ class OuterRectView @JvmOverloads constructor(
         mDiffMoveY = y - mLastMoveY
         mLastMoveX = x
         mLastMoveY = y
-        if (!mIsAllowDraw) { // 避免重复判断
-          // 判断移动的距离是否超过 mTouchSlop
-          if (abs(mDiffMoveX) > mTouchSlop || abs(mDiffMoveY) > mTouchSlop) {
-            /*
-            * 能走到这里，只有一种情况：ScrollView 中长按已激活，且移动距离小于 mTouchSlop
-            *
-            * 因为：
-            * 如果在长按激活前大于 mTouchSlop，ScrollView 直接拦截了，RectView 不会收到事件
-            * */
-            mIsAllowDraw = true
-            drawRect(mInitialX, mInitialY, x, y) // 绘制矩形
-          }
-        } else {
+        if (mIsAllowDraw) {
+          /*
+          * 只有允许绘制的时候才能绘制矩形
+          *
+          * 在什么时候会允许绘制？
+          * 答：长按激活过后
+          *
+          * 为什么要额外提供这个变量？
+          * 答：因为 RectView 回收到长按激活前的 Move 事件，所以需要做这个判断，
+          * 因此外部拦截法增加了 ScrollView 与 RectView 之间的耦合度。
+          * 如果想解决这个问题，可以去看 重写 dispatchTouchEvent 法；如果想彻底解决，可以去看 内部拦截法
+          * */
           drawRect(mInitialX, mInitialY, x, y) // 绘制矩形
         }
       }
@@ -131,5 +121,35 @@ class OuterRectView @JvmOverloads constructor(
       }
     }
     return true // 这里需要返回 true，代表子 View 会处理事件
+  }
+  
+  override fun onLongPressActivate() {
+    mIsAllowDraw = true
+    // 在长按激活时得立马绘制矩形
+    drawRect(mInitialX, mInitialX, mLastMoveX, mLastMoveY)
+  }
+  
+  init {
+    post {
+      /*
+      * 外面使用 post 是因为需要在完全布局后才有父布局
+      *
+      * 这里是设置长按激活的监听，下面的代码回去寻找 ScrollView，并且设置长按监听，因此增加了耦合度
+      *
+      * 但注意：虽然这里使用了接口，但并不是就能彻底解耦，因为 ScrollView 通过该接口持有 RectView 的引用，
+      * 如果你的 RectView 存在被 remove 的情况，还需要单独去 remove 掉这个长按监听
+      * */
+      var parent = parent
+      while (parent is ViewGroup) {
+        if (parent is OuterScrollView) {
+          parent.addOnLongPress(this)
+          break
+        }
+        parent = parent.parent
+      }
+      if (parent !is OuterScrollView) {
+        throw RuntimeException("${this::class.java.simpleName} 必须以 ${OuterScrollView::class.java.simpleName} 作为父布局！")
+      }
+    }
   }
 }
