@@ -72,6 +72,7 @@ class OuterRectView @JvmOverloads constructor(
   private var mDiffMoveX = 0
   private var mDiffMoveY = 0
   
+  // 是否允许绘制矩形，由是否激活了长按来决定
   private var mIsAllowDraw = false
   
   
@@ -100,9 +101,10 @@ class OuterRectView @JvmOverloads constructor(
           * 答：长按激活过后
           *
           * 为什么要额外提供这个变量？
-          * 答：因为 RectView 回收到长按激活前的 Move 事件，所以需要做这个判断，
+          * 答：因为 RectView 会收到长按激活前的 Move 事件，所以需要做这个判断，
           * 因此外部拦截法增加了 ScrollView 与 RectView 之间的耦合度。
-          * 如果想解决这个问题，可以去看 重写 dispatchTouchEvent 法；如果想彻底解决，可以去看 内部拦截法
+          * 如果只想解决这一个单独的问题，可以去看 重写 dispatchTouchEvent 法；
+          * 如果想彻底解决，可以去看 内部拦截法
           * */
           drawRect(mInitialX, mInitialY, x, y) // 绘制矩形
         }
@@ -134,7 +136,7 @@ class OuterRectView @JvmOverloads constructor(
       /*
       * 外面使用 post 是因为需要在完全布局后才有父布局
       *
-      * 这里是设置长按激活的监听，下面的代码回去寻找 ScrollView，并且设置长按监听，因此增加了耦合度
+      * 这里是设置长按激活的监听，下面的代码会去寻找 ScrollView，并且设置长按监听，因此增加了耦合度
       *
       * 但注意：虽然这里使用了接口，但并不是就能彻底解耦，因为 ScrollView 通过该接口持有 RectView 的引用，
       * 如果你的 RectView 存在被 remove 的情况，还需要单独去 remove 掉这个长按监听

@@ -109,7 +109,7 @@ class OuterScrollView @JvmOverloads constructor(
    */
   private val mLongPressRunnable = object : Runnable {
   
-    private var mIsInLongPress= false
+    private var mIsInLongPress = false
     
     // 与前面 mTouchSlop 类似，也是系统中定义好了的长按需要的时间
     private val mLongPressTimeout = ViewConfiguration.getLongPressTimeout().toLong()

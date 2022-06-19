@@ -44,7 +44,7 @@ class DispatchScrollView @JvmOverloads constructor(
   private var mDiffMoveX = 0
   private var mDiffMoveY = 0
   
-  // 是否需要在 dispatchTouchEvent 中断事件向下分发
+  // 是否需要在 dispatchTouchEvent 中中断事件向下分发
   private var mIsNeedBreakOff = true
   
   /**
@@ -77,6 +77,7 @@ class DispatchScrollView @JvmOverloads constructor(
         mLastMoveY = y
         if (mIsNeedBreakOff) {
           if (!mLongPressRunnable.isInLongPress()) {
+            // 不处于长按的时候
             if (abs(mDiffMoveX) > mTouchSlop || abs(mDiffMoveY) > mTouchSlop) {
               // 此时大于 mTouchSlop，等会在 onInterceptTouchEvent 中就直接拦截
               mIsNeedBreakOff = false
@@ -84,7 +85,7 @@ class DispatchScrollView @JvmOverloads constructor(
             } else {
               /*
               * 这里 return true 可以终止事件向下传递，意思就是 MOVE 事件会一直卡在这里，
-              * onInterceptTouchEvent 和 onTouchEvent 以及子 View 将都收不到这个 MOVE 事件，
+              * onInterceptTouchEvent 和 onTouchEvent 以及子 View 都将收不到这次 MOVE 事件，
               * 所以这里可以用来等待长按时间结束。
               * */
               return true
@@ -107,7 +108,7 @@ class DispatchScrollView @JvmOverloads constructor(
       // Down 事件必须调用 super，不然后面不能滚动
       val isIntercept = super.onInterceptTouchEvent(ev)
       if (isIntercept) {
-        // 这个判断与 OuterScrollView 的注释类似，但这里是 cancel 掉长按，因为长按是在 dispatchTouchEvent 中开启的
+        // 这个判断与 OuterScrollView 中的注释类似，但这里是取的反，并 cancel 掉长按，因为长按是在 dispatchTouchEvent 中开启的
         mLongPressRunnable.cancel()
         mIsNeedBreakOff = false
       }
@@ -127,7 +128,7 @@ class DispatchScrollView @JvmOverloads constructor(
    */
   private val mLongPressRunnable = object : Runnable {
     
-    private var mIsInLongPress= false
+    private var mIsInLongPress = false
     
     // 与前面 mTouchSlop 类似，也是系统中定义好了的长按需要的时间
     private val mLongPressTimeout = ViewConfiguration.getLongPressTimeout().toLong()
